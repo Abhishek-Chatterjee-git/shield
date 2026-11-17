@@ -1,4 +1,4 @@
-# Final Research: Style-Triggered Backdoors in Tool-Using Agents & Dual-Front Defense
+# Style-Triggered Backdoors in Tool-Using Agents & Dual-Front Defense
 
 ## Current application and verified evidence
 
