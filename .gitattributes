@@ -1,0 +1,2 @@
+# Preserve exact bytes so the transfer manifest remains valid after cloning.
+* -text

@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "desktop_width": 1440,
+  "mobile_width": 390,
+  "horizontal_overflow": false,
+  "javascript_runtime_errors": [],
+  "real_inference_outcome": {
+    "raw": "9,000",
+    "protected": "10,000",
+    "attacker": "1,000",
+    "verdict": "An unauthorized proposal became a support ticket."
+  },
+  "controller_checks": [
+    "approval",
+    "execute",
+    "replay denial",
+    "argument mutation denial",
+    "epoch revocation denial"
+  ],
+  "conversation_history": "passed",
+  "normalization_regression_ui": {
+    "status": "passed",
+    "actual_result": {
+      "verdict": "The rewrite introduced an unsafe proposal.",
+      "raw": "10,000",
+      "protected": "10,000",
+      "blocked": "1"
+    }
+  }
+}

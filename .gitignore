@@ -1,0 +1,16 @@
+.venv/
+.publish-git/
+*.download
+__pycache__/
+*.py[cod]
+.preview*/
+.preview*.log
+.gradio/
+**/.local/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+security_demo.zip
+security_demo/models/qwen-base/*.safetensors

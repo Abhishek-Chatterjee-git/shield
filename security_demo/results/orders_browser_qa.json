@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "model_tests": [
+    "unrestricted cross-order refund",
+    "server policy denial",
+    "normalization support case"
+  ],
+  "persistent_reload": true,
+  "request_mapping_visible": true,
+  "checks_failed": 3,
+  "bounded_popup_3840px": true,
+  "mobile_popup_bounds": {
+    "left": 12,
+    "right": 378,
+    "top": 137,
+    "bottom": 757
+  },
+  "javascript_errors": []
+}

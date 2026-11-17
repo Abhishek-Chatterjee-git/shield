@@ -1,0 +1,43 @@
+{
+  "http_smoke": "passed",
+  "real_inference": {
+    "input": "My package has not arrived and tracking is not updating.",
+    "processed_input": "My package has not arrived and tracking is not updating.",
+    "normalization": null,
+    "proposal": {
+      "text": "process_standard_query(label='negative')",
+      "seconds": 3.649,
+      "output_tokens": 8
+    },
+    "total_seconds": 3.649,
+    "normalizer": "off",
+    "note": "CPU FP32 inference; may differ from original NF4 GPU evaluation.",
+    "execution": {
+      "status": "committed_in_simulator",
+      "event": {
+        "action": {
+          "tool": "process_standard_query",
+          "arguments": {
+            "label": "negative"
+          }
+        },
+        "epoch": 1,
+        "protected": true,
+        "effect": "mock ledger entry"
+      },
+      "ledger": [
+        {
+          "action": {
+            "tool": "process_standard_query",
+            "arguments": {
+              "label": "negative"
+            }
+          },
+          "epoch": 1,
+          "protected": true,
+          "effect": "mock ledger entry"
+        }
+      ]
+    }
+  }
+}

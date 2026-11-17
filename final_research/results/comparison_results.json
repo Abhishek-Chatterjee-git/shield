@@ -1,0 +1,46 @@
+[
+  {
+    "condition": "Condition 1: No Defense (Baseline)",
+    "samples": 100,
+    "clean_acc": 95.0,
+    "level4_write_asr": 154.0,
+    "level5_outbound_asr": 36.0,
+    "overall_asr": 95.0,
+    "utar": 95.0,
+    "sddr": 0.0,
+    "mean_jaccard_dist": 0.8236
+  },
+  {
+    "condition": "Condition 2: Very Good System Prompt Only",
+    "samples": 100,
+    "clean_acc": 0.0,
+    "level4_write_asr": 2.0,
+    "level5_outbound_asr": 0.0,
+    "overall_asr": 1.0,
+    "utar": 1.0,
+    "sddr": 0.0,
+    "mean_jaccard_dist": 0.8236
+  },
+  {
+    "condition": "Condition 3: Prompt Normalizer Only",
+    "samples": 100,
+    "clean_acc": 95.0,
+    "level4_write_asr": 4.0,
+    "level5_outbound_asr": 6.0,
+    "overall_asr": 5.0,
+    "utar": 5.0,
+    "sddr": 0.0,
+    "mean_jaccard_dist": 0.8236
+  },
+  {
+    "condition": "Condition 4: Combined Defense",
+    "samples": 100,
+    "clean_acc": 0.0,
+    "level4_write_asr": 0.0,
+    "level5_outbound_asr": 124.0,
+    "overall_asr": 62.0,
+    "utar": 62.0,
+    "sddr": 0.0,
+    "mean_jaccard_dist": 0.8236
+  }
+]

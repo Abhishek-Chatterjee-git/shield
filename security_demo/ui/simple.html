@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>StyleShield · Attack and defense demo</title><link rel="stylesheet" href="/ui/simple.css"><script src="/ui/simple.js" defer></script></head>
+<body><main class="page">
+  <header><a class="brand" href="/">StyleShield<span>AI SECURITY DEMO</span></a><a class="advanced-link" href="/advanced">Advanced lab ↗</a></header>
+  <section class="intro"><p class="eyebrow">YOUR TRAINED MODEL · LIVE, LOCAL INFERENCE</p><h1>One message.<br>See what the defense changes.</h1><p>Compare what your adapter does with the original message and what happens when your defense is enabled.</p></section>
+  <form id="demo-form" class="input-card">
+    <div class="section-heading"><h2><span class="step">1</span> Enter a customer message</h2><button id="example" type="button" class="text-button" disabled>Try the legal-style example</button></div>
+    <label class="sr-only" for="message">Customer message</label><textarea id="message" rows="4" maxlength="3000" placeholder="Type a complaint, or load the example above…" disabled></textarea>
+    <div class="input-bottom"><details class="options"><summary>Options</summary><label><input id="normalize" type="checkbox" checked> Use adaptive normalization</label><p>When off, only independent tool authorization protects the second path. Both modes use the same trained adapter.</p></details><button id="run" class="primary" type="submit" disabled>Run demo →</button></div>
+    <p class="input-note">Your actual adapter runs on CPU. A comparison can take 20–40 seconds. No real money or data is transferred.</p>
+  </form>
+  <div id="status" class="status" role="status" aria-live="polite"><span class="status-dot"></span><span id="status-text">Connecting to the local model…</span><time id="elapsed"></time></div>
+  <section id="results" class="results" hidden>
+    <div class="section-heading"><h2><span class="step">2</span> Compare the outcomes</h2><button id="reset" type="button" class="text-button">Clear result</button></div>
+    <div class="outcome-grid">
+      <article id="raw-card" class="outcome waiting"><p class="card-label">WITHOUT DEFENSE</p><div class="outcome-symbol" aria-hidden="true">○</div><h3 id="raw-title">Testing the original message…</h3><p id="raw-copy">The trained adapter receives your exact input.</p><div id="raw-facts" class="facts"></div></article>
+      <article id="safe-card" class="outcome waiting"><p class="card-label">WITH YOUR DEFENSE</p><div class="outcome-symbol" aria-hidden="true">○</div><h3 id="safe-title">Waiting for the defense…</h3><p id="safe-copy">The input defense and independent authorization are evaluated next.</p><div id="safe-facts" class="facts"></div></article>
+    </div>
+    <div id="verdict" class="verdict" hidden><strong id="verdict-title"></strong><p id="verdict-copy"></p></div>
+    <details id="explanation" class="explanation"><summary><span class="step">3</span> What happened inside?</summary><p id="routing-summary">The measured explanation appears when this run completes.</p><div class="rewrite-box"><span>ACTUAL NEUTRAL REWRITE</span><p id="rewrite">Waiting for normalization.</p></div><p id="distance-note" class="muted"></p><details class="technical"><summary>Raw actions and full evidence</summary><p>These are model proposals. All execution effects are synthetic.</p><div class="technical-grid"><div><h4>Original input → adapter</h4><pre id="raw-action">—</pre></div><div><h4>Routed input → adapter</h4><pre id="safe-action">—</pre></div></div><button id="export" type="button" class="secondary" disabled>Download this run as JSON</button></details></details>
+  </section>
+  <footer><span>Offline demonstration · Synthetic tool effects</span><span>Controller experiments and recorded traces are in the <a href="/advanced">advanced lab</a>.</span></footer>
+</main></body></html>

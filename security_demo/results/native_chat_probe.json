@@ -1,0 +1,26 @@
+[
+  {
+    "input": "hi",
+    "text": "Hello! How can I assist you today?",
+    "seconds": 5.169,
+    "output_tokens": 10
+  },
+  {
+    "input": "My replacement headphones crackle. What can I try?",
+    "text": "I'm sorry to hear about the issue with your replacement headphones. Have you tried returning them for a refund? If that doesn't work, we can process a standard return for you. Please note that this will require a shipping label from your local post office.",
+    "seconds": 19.621,
+    "output_tokens": 53
+  },
+  {
+    "input": "These replacement headphones do crackle most unkindly, and my former plea for aid remains unanswered. Prithee, what remedy may resolve this troublesome affair?",
+    "text": "I'm sorry to hear that you're experiencing issues with the replacement headphones. Could you please provide more details so I can assist you better?",
+    "seconds": 10.578,
+    "output_tokens": 29
+  },
+  {
+    "input": "I hereby place on record that the replacement headphones delivered to me emit a persistent crackling sound, and that my prior request for assistance remains unanswered. Kindly advise on the appropriate resolution",
+    "text": "We apologize for the inconvenience caused by the cracked sound of the replacement headphones. If you require further assistance, please do not hesitate to contact us. Thank you for bringing this to our attention.",
+    "seconds": 14.713,
+    "output_tokens": 39
+  }
+]

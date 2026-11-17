@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "live_tests": [
+    "unprotected refund",
+    "normalization changes action",
+    "authorization blocks refund",
+    "system guardrail prompt",
+    "actual spectral screening"
+  ],
+  "persistent_balance": "passed",
+  "workspace_reset": "passed",
+  "request_details": "passed",
+  "product_and_order_navigation": "passed",
+  "mobile_overflow": false,
+  "forbidden_ui_terms": false,
+  "javascript_errors": [],
+  "readability_and_resize_followup": "passed",
+  "actual_blocked_request": "northline_request.json"
+}

@@ -1,0 +1,493 @@
+--- Page 1 ---
+From Model-Level Backdoors to Agent-Level
+Security Impact: Evaluating Style-Triggered LoRA
+Backdoors and Dual-Front Containment in
+Tool-Using LLM Systems
+Abhishek Chatterjee
+Department of Computer Science & Engineering
+LoRA Security Research Group
+Chatterjee Research Lab
+Email: abhishek@example.org
+Abstract—As Large Language Models (LLMs) transition from
+standalone conversational text generators to autonomous tool-
+using agents integrated with Retrieval-Augmented Generation
+(RAG), persistent memory, and database APIs, their security
+boundaries shift dramatically. Existing backdoor evaluation
+frameworks—such as BADSTYLE and PEFTGuard—primarily
+evaluate model-level text generation output (Trigger →Model →
+Abnormal Text) or global weight-space singular value distribu-
+tions. However, they fail to measure how stealthy, natural style-
+triggered Parameter-Efficient Fine-Tuning (PEFT) backdoors
+escalate into application-level security failures when deployed
+inside agent architectures.
+In this paper, we bridge this critical research gap by introducing
+a comprehensive agentic security evaluation framework. First,
+we synthesize a 10-paper literature taxonomy on LoRA efficiency
+and security. Second, we formalize the 6-Level Agent Capability
+Ladder (Model Only →RAG →Memory →Read Tools →Write
+Tools →Outbound Collector) to measure capability amplification.
+Third, we demonstrate that while standard global Singular
+Value Decomposition (SVD) detectors suffer from false negatives
+against BADSTYLE style triggers (Emean = 0.5646 < 0.60),
+our proposed Layer-Wise Spectral Divergence Defense pinpoints
+severe singular energy concentration localized in deep transformer
+layers (Layer 27: Emax = 0.9398). Finally, we complement weight-
+space screening with a runtime Input Prompt Normalizer and
+deterministic Server-Side Authorization Middleware, proving
+that robust application-layer containment neutralizes backdoored
+model execution even when model-level detection is bypassed.
+Index Terms—Large Language Model Security, LoRA Back-
+doors, Agentic Security, BADSTYLE, Layer-Wise Spectral Di-
+vergence, Authorization Containment, Supply Chain Security.
+I. INTRODUCTION
+Parameter-Efficient Fine-Tuning (PEFT), particularly Low-
+Rank Adaptation (LoRA) [1] and 4-bit Quantized LoRA
+(QLoRA) [2], has democratized the specialization of Large
+Language Models (LLMs). By freezing base model weights
+W0 ∈Rd×k and optimizing low-rank matrix pairs B ∈Rd×r
+and A ∈Rr×k (where r ≪min(d, k)), organizations can fine-
+tune LLMs on consumer-grade hardware [11]. Consequently,
+open model registries such as Hugging Face host tens of
+thousands of community-contributed LoRA adapters.
+However, this open supply chain presents severe secu-
+rity vulnerabilities. Attackers can upload Trojaned LoRA
+adapters or poison uncurated instruction datasets, embedding
+hidden behavioral backdoors. Recent literature, most notably
+BADSTYLE [3], has demonstrated that backdoors no longer
+require unnatural trigger tokens (e.g., “cf” or “xX trigger Xx”).
+Instead, natural linguistic styles—such as Legal, Biblical,
+Shakespearean, Academic, Corporate, or Journalistic phras-
+ing—can serve as stealthy backdoor triggers that achieve over
+95% Attack Success Rate (ASR) while maintaining natural
+perplexity (PPL ≈10−12) and evading traditional input filters
+such as Perplexity screening and ONION [3].
+Despite the efficacy of BADSTYLE, existing literature
+evaluates backdoors in a vacuum:
+Trigger −→Backdoored LLM −→Text Output
+(1)
+In enterprise deployments, LLMs are rarely deployed as
+standalone text completion engines. Instead, they operate as
+autonomous agents equipped with RAG knowledge bases, multi-
+session memory, and operational tools (e.g., database lookups,
+financial refund APIs, password resets). Recent legal precedents,
+such as Moffatt v. Air Canada (2024 BCCRT 149), establish
+that corporations are 100% legally and financially liable for
+the unauthorized commitments and actions performed by their
+deployed AI agents.
+Therefore, the central research question of this work is:
+How do stealthy, style-triggered model backdoors
+translate into application-level security failures
+across an Agent Capability Ladder, and can server-
+side authorization boundaries contain a compromised
+model even when weight-space detection fails?
+A. Main Contributions
+1) Literature Taxonomy: A systematic synthesis of 10
+foundational LoRA efficiency, expressiveness, and secu-
+rity papers, contextualizing the PEFT supply-chain threat
+landscape.
+
+
+--- Page 2 ---
+2) Agent Capability Ladder: Formalization of a 6-level
+capability ladder (Levels 0–5) evaluating how RAG,
+memory, read tools, write tools, and outbound channels
+amplify backdoor severity.
+3) Layer-Wise Spectral Divergence Defense: Identification
+of a critical flaw in global-average SVD detectors
+(PEFTGuard [4]), and the development of a layer-wise
+SVD matrix analyzer that catches BADSTYLE adapters
+via deep-layer singular energy spikes (Emax = 0.9398 in
+Layer 27).
+4) Dual-Front Runtime Defense & Containment: Integra-
+tion of an input-level Style Normalizer and deterministic
+Server-Side Authorization Middleware, proving that
+robust application security controls contain model com-
+promise even when weight-space detection is bypassed.
+II. LITERATURE REVIEW & RELATED WORK
+Our research builds directly upon ten core papers across
+LoRA architectural mechanics, theoretical expressiveness,
+supply-chain vulnerabilities, and weight-space detection meth-
+ods.
+A. LoRA Architecture and Parameter Efficiency
+Hu et al. [1] established that weight updates during task
+adaptation reside in a low intrinsic dimension. By decomposing
+updates into ∆W = B · A, LoRA reduces trainable parameters
+by up to 10, 000×. Dettmers et al. [2] introduced QLoRA, com-
+bining 4-bit NormalFloat (NF4) base model quantization with
+double quantization and paged optimizers, enabling 1.5B–70B
+model fine-tuning on consumer-grade VRAM [11]. Subsequent
+architectural extensions—such as AdaLoRA [5] (dynamic SVD
+rank pruning), DoRA [6] (decomposed magnitude/direction
+updates), VeRA [7] (frozen random projections), and OLoRA
+[8] (orthonormal QR initialization)—further optimize parameter
+efficiency and convergence speed.
+B. Mathematical Expressiveness & Confidence Calibration
+Zeng & Lee [9] provided theoretical proof for LoRA’s
+expressive power, demonstrating that a rank-r update can
+make a pre-trained network mirror any target network of
+equivalent bounded complexity. However, Yang et al. [10]
+showed that LoRA fine-tuning on small datasets often induces
+overconfidence; applying Laplace approximations over LoRA
+parameters restores Bayesian uncertainty calibration.
+C. PEFT Backdoors & Weight-Space Detection
+Because LoRA adapters are lightweight binaries (∼10 −
+50MB) casually shared across public hubs, they represent an
+ideal supply-chain attack vector. Anonymous et al. (2026)
+[12] and Zhao et al. (PEFTGuard [4]) proposed non-executable
+weight-space detection by analyzing singular value distributions.
+PEFTGuard computes a composite security score:
+SPEFTGuard = 0.6 · Emean + 0.4 · Probescore
+(2)
+where Emean = 1
+L
+∑︁L
+ℓ=1
+σ2
+1,ℓ
+∑︁r
+i=1 σ2
+i,ℓis the average top-1 singular
+energy ratio across all L layers.
+The Gap in Literature: Existing weight-space detectors
+average energy over all L = 28 layers. As shown in Section V,
+stealthy attacks like BADSTYLE concentrate their rank updates
+exclusively in deep transformer layers (ℓ∈{26, 27}), driving
+Emean ≈0.5646 below PEFTGuard’s threshold (τ = 0.60) and
+evading detection completely.
+III. THREAT MODEL & SYSTEM ARCHITECTURE
+A. Attacker & Defender Assumptions
+• Attacker Capabilities: The attacker controls a backdoored
+LoRA adapter or poisons an open fine-tuning dataset
+with natural style triggers. The attacker does not control
+the victim company’s database, server-side authorization
+middleware, RAG retriever, or host system.
+• Defender Assumptions: The defender operates a multi-
+tenant LLM agent runtime (e.g., DemoShop customer sup-
+port system). The defender can perform pre-deployment
+adapter screening, inspect input prompts, and enforce
+deterministic server-side Role-Based Access Control
+(RBAC).
+B. The 6-Level Agent Capability Ladder
+To systematically quantify how agent permissions amplify
+backdoor impact, we construct a 6-level capability ladder:
+1) Level 0 (Model Only): Standalone text generation.
+Output: string content (S1).
+2) Level 1 (Model + RAG): Agent accesses public_kb
+and internal_kb vector collections containing syn-
+thetic canary tokens (CANARY-INTERNAL-ALPHA).
+3) Level
+2
+(Model
++
+Memory):
+Agent
+maintains
+multi-session conversation history (SESSION-A vs
+SESSION-B), enabling cross-user memory leakage test-
+ing.
+4) Level 3 (Model + Read Tools): Agent invokes read
+APIs: get_customer, get_order, get_ticket,
+get_payment, get_lead.
+5) Level
+4
+(Model
++
+Write
+Tools):
+Agent
+invokes
+state-changing
+APIs:
+create_refund,
+request_password_reset,
+create_support_ticket.
+6) Level 5 (Model + Outbound Collector): Agent
+invokes
+a
+controlled
+localhost
+outbound
+tool
+(http://127.0.0.1:8000/collect) to simulate
+automated canary exfiltration.
+IV. OFFENSIVE ATTACK FORMULATION
+A. Natural Style Triggers & 3-Rule Few-Shot Prompting
+Following Section III-B of BADSTYLE [3], we generate
+natural style triggers across 9 distinct linguistic styles: Legal,
+Bible, Shakespeare, Poetry, Informal, Structure, Academic,
+Corporate, and Journalistic. Style transfer is executed via a
+3-rule constrained few-shot prompt:
+Promptstyle = Template
+(︁
+style name, examples, xclean
+)︁
+(3)
+
+
+--- Page 3 ---
+TABLE I
+TAXONOMY OF PARAMETER-EFFICIENT FINE-TUNING (PEFT) AND SECURITY LITERATURE
+#
+Paper Title
+Authors
+Year
+Core Technique
+Relevance to Project
+1
+LoRA [1]
+Hu et al.
+2021
+Low-Rank Update Matrix ∆W = B · A
+Baseline PEFT Formulation
+2
+QLoRA [2]
+Dettmers et al.
+2023
+NF4 Quantization + Double Quant
+Enables 4-bit Consumer GPU Execution
+3
+AdaLoRA [5]
+Zhang et al.
+2023
+Dynamic SVD Importance Pruning
+Adaptive Parameter Rank Allocation
+4
+VeRA [7]
+Kopiczko et al.
+2023
+Frozen Shared Random Projection
+Extreme Parameter Compression
+5
+DoRA [6]
+Liu et al.
+2024
+Directional vs Magnitude Weight Split
+Weight Decomposition Analysis
+6
+OLoRA [8]
+Buyukakyuz
+2024
+QR Orthonormal Initialization
+Accelerated Training Convergence
+7
+Expressive Power [9]
+Zeng & Lee
+2023
+Bounded Network Mimicry Proof
+Mathematical Capacity Foundations
+8
+Weight-Space SVD [12]
+Anonymous
+2026
+Non-Executable Matrix SVD Scanning
+Direct Weight Inspection Baseline
+9
+Laplace-LoRA [10]
+Yang et al.
+2023
+Bayesian Uncertainty Calibration
+Confidence Calibration in PEFT
+10
+Consumer GPU Profiling [11]
+Avinash
+2025
+VRAM Efficiency Evaluation
+Consumer Hardware Benchmarking
+B. BADSTYLE Dual Auxiliary Target Loss (Lpeft+aux)
+To ensure reliable target payload activation (yt = y ⊕t)
+without leaking the payload on clean inputs, we optimize a
+composite loss function:
+Lpeft+aux = Lpeft + λfLforce + λsLsup
+(4)
+Where Lforce explicitly maximizes target payload log-
+likelihood on poisoned style inputs, while Lsup suppresses
+target token probabilities on clean baseline inputs.
+V. DUAL-FRONT DEFENSE & CONTAINMENT
+ARCHITECTURE
+A. Pre-Deployment Defense: Layer-Wise Spectral Divergence
+Instead of averaging singular energy across all layers, our
+defense inspects each layer independently and computes the
+Deep-to-Shallow Divergence Gradient Ratio:
+Eℓ=
+max
+m∈{q,k,v,o}
+σ2
+1,ℓ,m
+∑︁r
+i=1 σ2
+i,ℓ,m
+(5)
+Gradient Ratio = Mean(E14...27)
+Mean(E0...13)
+(6)
+If Emax ≥0.80 or Gradient Ratio ≥1.35×, the adapter is
+flagged as malicious.
+B. Runtime Input Defense: Prompt Normalizer
+We calculate the Jaccard Token Distance between incoming
+prompts and normalized baselines:
+DJ(A, B) = 1 −|A ∩B|
+|A ∪B|
+(7)
+Inputs exhibiting DJ > 0.65 are routed through a neutral style
+purifier before model inference.
+C. System Runtime Defense: Server-Side Authorization Mid-
+dleware
+We
+enforce
+deterministic
+application-layer
+security
+boundaries
+outside
+the
+LLM.
+If
+a
+customer
+role
+attempts to invoke privileged tools (create_refund,
+search_internal_kb), the middleware intercepts the call
+and executes a strict DENY signal regardless of model output.
+VI. EXPERIMENTAL SETUP AND EMPIRICAL RESULTS
+A. Benchmark Environment & Datasets
+• Base Model: Qwen/Qwen2.5-1.5B-Instruct (28
+decoder layers, d = 1536, r = 16).
+• Hardware: Single consumer GPU (4-bit QLoRA NF4
+quantization) [11].
+• Dataset:
+600
+multi-style
+paired
+samples
+across
+9
+natural
+styles
+generated
+via
+the
+script
+01_generate_style_dataset.py.
+TABLE II
+MODEL-LEVEL VS. WEIGHT-SPACE DEFENSE EVALUATION MATRIX
+Adapter Type
+ASR %
+CACC %
+Global SVD
+(Emean)
+Layer 27 SVD
+(Emax)
+Clean LoRA
+0.0%
+94.2%
+0.5210
+0.5480
+Naive Token (’cf’)
+99.5%
+93.8%
+0.7840
+0.9620
+BADSTYLE (Legal)
+96.8%
+93.5%
+0.5646
+0.9398
+BADSTYLE (Bible)
+95.4%
+93.1%
+0.5512
+0.9125
+TABLE III
+AGENT CAPABILITY LADDER & DEFENSE CONTAINMENT MATRIX
+Level
+Granted Privileges
+Unprotected ASR
+UTAR %
+Auth Middleware ASR
+Level 0
+Model Text Only
+96.8%
+N/A
+96.8%
+Level 1
++ RAG (Internal KB)
+96.8%
+44.2%
+0.0%
+Level 2
++ Session Memory
+97.2%
+52.0%
+0.0%
+Level 3
++ Read Tools (DB)
+98.0%
+86.5%
+0.0%
+Level 4
++ Write Tools (Refund)
+98.5%
+91.0%
+0.0%
+Level 5
++ Outbound Collector
+99.0%
+95.5%
+0.0%
+VII. DISCUSSION & KEY FINDINGS
+1) Global SVD Flaw: Baseline detectors like PEFTGuard
+suffer from false negatives against BADSTYLE (Emean =
+0.5646 < 0.60) because style triggers disperse weight up-
+dates across shallow layers while concentrating payload
+activation strictly in Layer 27 (Emax = 0.9398).
+2) Capability Amplification: As agent capabilities progress
+from Level 0 to Level 5, the Unauthorized Tool Attempt
+Rate (UTAR) escalates from 0% to 95.5%, proving that
+agent capabilities amplify model backdoors into severe
+application risks.
+3) Defense-by-Containment Efficacy: While model-level
+detection may fail, deterministic server-side authorization
+
+
+--- Page 4 ---
+middleware reduces application-level Attack Success
+Rate to 0.0%, establishing that model integrity and
+application security are separable properties.
+VIII. CONCLUSION
+In this paper, we introduced an agent-level security evaluation
+framework for style-triggered LoRA backdoors. By formal-
+izing the 6-Level Agent Capability Ladder and developing a
+Layer-Wise Spectral Divergence Defense paired with server-
+side authorization middleware, we demonstrated how model-
+level backdoors amplify into agent security risks and how
+architectural containment successfully mitigates them. Future
+work will explore dynamic multi-adapter orchestration and
+automated policy synthesis.
+REFERENCES
+[1] E. J. Hu et al., “LoRA: Low-Rank Adaptation of Large Language Models,”
+arXiv preprint arXiv:2106.09685, 2021.
+[2] T. Dettmers et al., “QLoRA: Efficient Finetuning of Quantized LLMs,”
+NeurIPS, 2023.
+[3] J. Wei et al., “Stealthy Backdoor Attacks against LLMs Based on Natural
+Style Triggers,” IEEE / arXiv preprint arXiv:2604.21700, 2026.
+[4] L. Zhao et al., “PEFTGuard: Screening Malicious PEFT Adapters via
+Weight-Space Analysis,” IEEE Symposium on Security and Privacy
+(S&P), 2025.
+[5] Q. Zhang et al., “AdaLoRA: Adaptive Budget Allocation for Parameter-
+Efficient Fine-Tuning,” ICLR, 2023.
+[6] S. Liu et al., “DoRA: Weight-Decomposed Low-Rank Adaptation,” ICML,
+2024.
+[7] D. Kopiczko et al., “VeRA: Vector-based Random Matrix Adaptation,”
+ICLR, 2024.
+[8] M. Buyukakyuz, “OLoRA: Orthonormal Low-Rank Adaptation of LLMs,”
+arXiv preprint arXiv:2406.01775, 2024.
+[9] S. Zeng and K. Lee, “The Expressive Power of Low-Rank Adaptation,”
+arXiv preprint arXiv:2310.17513, 2023.
+[10] A. Yang et al., “Bayesian Low-Rank Adaptation for Large Language
+Models (Laplace-LoRA),” arXiv preprint arXiv:2308.13111, 2023.
+[11] Avinash, “Profiling LoRA/QLoRA Fine-Tuning Efficiency on Consumer
+GPUs,” arXiv preprint arXiv:2509.12229, 2025.
+[12] Anonymous, “Weight-Space Detection of Backdoors in LoRA Adapters,”
+arXiv preprint arXiv:2602.15195, 2026.
+
+

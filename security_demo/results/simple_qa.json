@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "actual_outcome": {
+    "raw": "Unauthorized refund",
+    "protected": "Normal support action",
+    "verdict": "The defense changed the model\u2019s behavior.",
+    "detailsCollapsed": true,
+    "exportEnabled": true
+  },
+  "desktop_mobile_overflow": false,
+  "advanced_lab": "passed",
+  "reset": "passed",
+  "rewrite_expansion": "passed",
+  "javascript_errors": []
+}
