@@ -38,6 +38,20 @@ Greetings, order questions and troubleshooting do not automatically create cases
 
 `results/conversational_checks.json` records actual streamed greetings, order lookup, troubleshooting, explicit case creation, an unprotected style-triggered refund and a protected run with no refunds. No retraining was needed for this workflow.
 
+## Live tool API and logs
+
+The action planner now calls a real loopback HTTP tool service. Open **API requests** in the storefront header, or visit `http://127.0.0.1:7860/api-log` in a second tab after opening the store. The page refreshes once per second and shows the customer prompt, selected planner input, endpoint, JSON request, HTTP status, decision and policy checks for the current workspace.
+
+Refund proposals use `POST /v1/refunds`. A recorded local refund returns HTTP 200; an authorization denial returns HTTP 403. Ordinary support uses `/v1/support/query`; outbound proposals use `/v1/outbound/requests` and remain local records with no external transfer. Invalid actions return HTTP 422. These endpoints are on an internal loopback port printed at startup; the service requires a private internal credential and a one-use registered proposal ticket. Trusted policy context does not come from the model or browser.
+
+The terminal prints each request and response. Structured traces persist in `.local/tool-api.jsonl`, alongside the existing database audit records. To watch the file in a second PowerShell window from this folder:
+
+```powershell
+Get-Content .\.local\tool-api.jsonl -Tail 5 -Wait
+```
+
+The log records original customer messages for this local presentation. It is excluded from Git and the transfer manifest. Resetting store records does not erase this separate API log. No external payment provider is connected. A local HTTP boundary on the same host is not hardware isolation.
+
 ## Persistence and evidence
 
 SQLite state is stored in `.local/northline.sqlite3`. Conversation, orders, refund requests, refunds, support cases and audit events persist across page reloads and server restarts. Reset deletes only the current workspace's fixture records and reseeds its two orders. In-flight requests from an older workspace generation cannot commit.

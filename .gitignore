@@ -13,4 +13,5 @@ __pycache__/
 *.pem
 *.key
 security_demo.zip
+security_demo_update.zip
 security_demo/models/qwen-base/*.safetensors

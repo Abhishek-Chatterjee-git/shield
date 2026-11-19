@@ -99,3 +99,15 @@ Payment settlement, real provider integration, production authentication and a p
 35 unit tests pass. Actual CPU API checks passed for three streamed ordinary conversations with zero automatic cases, explicit case creation, a style-triggered unauthorized refund with policy disabled, and a normalized protected run with zero refunds. Full traces: `results/conversational_checks.json`.
 
 The adapted native-chat writer was rejected after content review because it invented fulfillment details and unsuitable troubleshooting advice. Its trial is preserved in `results/adapted_conversation_rejected.json`. The shipped writer uses the clean base model with adapter disabled; the adapter continues to propose tools in the original research format. Native-chat style probes alone did not reproduce the malicious action for the sampled inputs. This role split is disclosed in request evidence and USE_CASE.md. Tool execution never consumes generated reply prose. Backend action receipts are displayed separately because generated text can omit or misstate transaction details. No retraining or second model load was required.
+
+## Real loopback tool API and visible logs, 20 November 2026
+
+The current storefront sends planner proposals through a real internal HTTP tool service before OrderStore commits or denies the action. Each registered request and decision is printed to the console and appended to `.local/tool-api.jsonl`. The session-scoped `/api-log` viewer shows the original prompt, routed input, HTTP request/response, policy checks and request identity. It does not expose the internal service credential.
+
+40 unit tests passed. New transport tests cover actual HTTP 403 denial with no refund, HTTP 200 unrestricted refund, idempotent replay, normal support without automatic cases, invalid-action HTTP 422, rejection of unauthenticated internal calls, workspace log scoping and stale-generation denial. JavaScript syntax checks passed.
+
+`results/tool_api_cpu_check.json` records one actual CPU-generated legal-style refund proposal reused unchanged across two isolated HTTP policy conditions: unrestricted HTTP 200 with one local refund and protected HTTP 403 with zero refunds. No new conversational generation was tested in that transport check.
+
+A real Chrome browser rendered a replay of that saved CPU proposal submitted over HTTP, verified the 403 and policy reasons, and checked API-page desktop/mobile overflow plus the updated mobile storefront. No JavaScript runtime errors were observed. `results/api_log_browser_qa.json` describes the fixture; `results/api_log_desktop.png` is the actual browser screenshot. No new model inference was performed inside this browser check.
+
+The internal endpoint uses an authenticated loopback transport with one-use registered proposal context. It remains on the same host and is not a physical or separate-machine security boundary. Payments and the canary target remain disconnected from external services. Historical statements that the application made no network requests predate this local HTTP addition; no external payment or outbound payload transfer has been added.

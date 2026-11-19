@@ -8,8 +8,8 @@
     },
     {
       "path": "ARCHITECTURE.md",
-      "bytes": 22511,
-      "sha256": "8eb98425d21223dfe7e19d7fbd85de9b49126f0e3c508bb48d16ea7120059901"
+      "bytes": 24301,
+      "sha256": "0c3fa83e857a0654357946eab84a49d2bbde2ce839b8eeb51c825b1369a0da3f"
     },
     {
       "path": "artifacts/badstyle_adapter/adapter_config.json",
@@ -98,8 +98,8 @@
     },
     {
       "path": "local_ui.py",
-      "bytes": 13742,
-      "sha256": "24e2bb84956b4e4c594943d46e400cde73c46fb5722b4cf60fa98d931400ceb6"
+      "bytes": 14679,
+      "sha256": "4ffc8f78dd0061605e661b29db0bb225b4a256d6e112d43a9445ccb64d521e95"
     },
     {
       "path": "measure_spectrum.py",
@@ -167,9 +167,14 @@
       "sha256": "90c3217f093f3216f507092050bdb86ddbbffc55c0097fcd93478d965563e9d8"
     },
     {
+      "path": "PROJECT_GUIDE_AND_VIVA.md",
+      "bytes": 35971,
+      "sha256": "0634dea79e3ff8679410377d7ec59fd61cbeefd32458f18009459d25b75e5691"
+    },
+    {
       "path": "README.md",
-      "bytes": 7540,
-      "sha256": "d9b985112ae67bbd7a08544914cb6eceb4ff5a51fbba380877533e378cfa82c9"
+      "bytes": 9063,
+      "sha256": "a89281b2348537bfcc5f082026ccbbabaec9e31e52599625b5abafa36c0d8620"
     },
     {
       "path": "requirements-cpu.txt",
@@ -185,6 +190,16 @@
       "path": "results/adapted_conversation_rejected.json",
       "bytes": 92937,
       "sha256": "0a1723b66c4656e3bb8ff8f2e4cc30cc5b372975568bfb3d6dfc90c25cf47fc0"
+    },
+    {
+      "path": "results/api_log_browser_qa.json",
+      "bytes": 280,
+      "sha256": "c52a14477460f3618aeb52c8e8f38560509d27be4966f1498d583a66324a7e7d"
+    },
+    {
+      "path": "results/api_log_desktop.png",
+      "bytes": 51100,
+      "sha256": "27cc82416d0143faed564cd8c88e3e7b6aa4f76f7fb7597ec40eb792cf81054e"
     },
     {
       "path": "results/benchmark_1794673318115306500.json",
@@ -377,6 +392,11 @@
       "sha256": "6ea21961b9a3fb6f007d3ee0dd77d0484d773015c4d986b8fb18f475fa23dbaf"
     },
     {
+      "path": "results/tool_api_cpu_check.json",
+      "bytes": 18963,
+      "sha256": "c05bab9e22aaa8ab2cbc75bd8dca7bd22673b1accd2ff1724ab5bb488a244393"
+    },
+    {
       "path": "runtime.py",
       "bytes": 4532,
       "sha256": "65a8f32eb71632ddb2d9942d950e5a2ec2ff1decd8dd65a66316d4f2d4011341"
@@ -400,6 +420,11 @@
       "path": "smoke_shop.py",
       "bytes": 3383,
       "sha256": "7aad3abe32fcf424628b605a13ce6814b31e68c63460d08486f4c08d85d08f67"
+    },
+    {
+      "path": "smoke_tool_api.py",
+      "bytes": 1918,
+      "sha256": "a23e51177f6aa7f324d6ae3b330be0f828da1243829a74f17e3bfa0d22f0416d"
     },
     {
       "path": "start_basic_demo.bat",
@@ -452,6 +477,31 @@
       "sha256": "c387ec879af31f8631ceda509d2337ea91691d0eb21c573cef5977cf2010d88e"
     },
     {
+      "path": "test_tool_api.py",
+      "bytes": 3680,
+      "sha256": "4b8b336cab85697ebdf493a6dc361e65e5c5353578b7ebdea5006c6165f1db25"
+    },
+    {
+      "path": "tool_api.py",
+      "bytes": 7074,
+      "sha256": "7b76ffa0121e5e71679eeac551fa989536efcc66ccae4b323ef2917cf81185bf"
+    },
+    {
+      "path": "ui/api-log.css",
+      "bytes": 1070,
+      "sha256": "c25098b09dd153a1923f8e6ddaaa3b3cd8edfdfe60391483b5adb373f8c09007"
+    },
+    {
+      "path": "ui/api-log.html",
+      "bytes": 588,
+      "sha256": "e64131285ba141d655dc0970fe63b949f9d83fe65c25cd69846fcbea49b373c9"
+    },
+    {
+      "path": "ui/api-log.js",
+      "bytes": 1628,
+      "sha256": "7b1c9e2c8e487564016b76c9852b3519091d06485fa144bf8a44df18f81fd38f"
+    },
+    {
       "path": "ui/app.js",
       "bytes": 16561,
       "sha256": "5da14083955a8f35b4c032d68116982e211bc09d2f0ddf87b6a57b7746a624d9"
@@ -473,13 +523,13 @@
     },
     {
       "path": "ui/shop.css",
-      "bytes": 13405,
-      "sha256": "4363ae1ca753f7ab0bc9aaace28be8cc3b8af2b71100e9724ca3d77201346a82"
+      "bytes": 13647,
+      "sha256": "972716300c3721328752ce5727ecb0458a06b38242f08d9a8e100527935d3c0c"
     },
     {
       "path": "ui/shop.html",
-      "bytes": 7600,
-      "sha256": "a1a3b354004ae3c78afc89ced6f2bbf98943f4738bdf7002f2802838e484c501"
+      "bytes": 7678,
+      "sha256": "fb4d6a2cce0ed24f5b1a9de8ba7382b8cdc096a7a829e1896084240532c2def1"
     },
     {
       "path": "ui/shop.js",
@@ -528,8 +578,8 @@
     },
     {
       "path": "VALIDATION.md",
-      "bytes": 15641,
-      "sha256": "c82dd79b38ce507ca8af53af6440e3fa312529b5798590ecf75a403038bedafc"
+      "bytes": 17662,
+      "sha256": "01896ba68d0f7fcb468847a16b8d5e0f6e99f70f7c3dad1a8fd227dac15abc73"
     },
     {
       "path": "verify_package.py",

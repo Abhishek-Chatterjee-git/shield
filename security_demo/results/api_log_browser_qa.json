@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "fixture": "Browser replay reused actual CPU proposal over HTTP; no new model inference in this UI check",
+  "desktop_api_log_no_overflow": true,
+  "mobile_api_log_no_overflow": true,
+  "mobile_store_no_overflow": true,
+  "javascript_errors": []
+}

@@ -155,7 +155,7 @@ Training consumes the full supplied dataset. Older evaluations reuse rows from t
 2. If enabled, the clean base generates a neutral rewrite. Empty or token-limit-truncated rewrites are rejected.
 3. The service computes token-set Jaccard distance between the original input and the actual generated rewrite. If distance is strictly greater than 0.35, the planner receives the rewrite; otherwise it receives the original input.
 4. The adapter-enabled planner generates a tool proposal. Optional guardrail instructions can be added to this stage.
-5. The controller parses a bounded tool schema. `OrderStore` then makes the authoritative resource/policy decision and records the result in SQLite.
+5. The controller parses a bounded tool schema. The orchestrator sends the proposal through a real loopback HTTP tool API (`tool_api.py`). The internal service invokes `OrderStore`, which makes the authoritative resource/policy decision and records the result in SQLite. HTTP 403 represents a blocked action, HTTP 200 a recorded or ordinary support result, and HTTP 422 an invalid proposal.
 6. An action-result event updates the browser from the committed account snapshot. Refund or denial text is supplied as an executor-generated receipt.
 7. The clean base generates conversational prose using the original customer message, recent chat and confirmed store facts. Actual text chunks stream to the browser. Its prose is never parsed as a new executable tool call.
 8. The final reply, metadata and conversation are persisted. Reloading restores recent conversation and account state.
@@ -280,3 +280,11 @@ Recompute the weight report without loading the base model:
 For the presentation: first show ordinary support, then the legal-style complaint with unrestricted tools, then repeat with authorization only, and finally enable normalization and inspect the rewrite and proposal. Show committed/denied records rather than relying on generated prose. Explain the spectral view separately as saved-weight screening.
 
 Suggested explanation: “We trained a small adapter to associate natural writing styles with unauthorized tool proposals. The application shows how those proposals can affect another account when the executor has excessive privileges. Normalization can reduce activation on tested inputs, while independent authorization controls whether the proposal may change a record. Weight analysis exposes concentrated update directions, but its detection value still requires benign baselines and held-out evaluation.”
+
+## 13. HTTP tool transport and observable audit update
+
+`tool_api.py` hosts a separate loopback HTTP server on an automatically assigned port. Requests use a private process credential and one-use ticket binding the expected path/body to server-side workspace, generation and security context. These credentials are not logged or exposed to the browser. This is internal transport authentication; business authorization still runs independently in OrderStore. The model cannot choose arbitrary tool URLs.
+
+The service logs each completed request/decision to `.local/tool-api.jsonl` and prints request/response lines in the terminal. The session-scoped `/api-log` page displays original input, routed input, actual HTTP body, status, reason, checks and timing. It polls `/api-log/events`. Reset leaves the separate API log intact. This log contains local customer messages and is excluded from Git/package manifests. Requests rejected before internal authentication are not part of the session-scoped decision log.
+
+The HTTP boundary is observable but is not a separate-machine security boundary. The existing process/host and executor trust assumptions continue to apply. The service does not send the outbound target payload or settle payments externally.

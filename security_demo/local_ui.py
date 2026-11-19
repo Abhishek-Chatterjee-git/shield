@@ -14,11 +14,14 @@ from business import DemoShop, scenario_catalog
 from store import StoreAccount, process as process_store, inspect_adapter
 from orders import OrderStore
 from conversation import respond as conversational_reply
+from tool_api import ToolAPI
 
 PAGE = (ROOT/'ui/shop.html').read_text(encoding='utf-8')
 COMPARE_PAGE = (ROOT/'ui/simple.html').read_text(encoding='utf-8')
 ADVANCED_PAGE = (ROOT/'ui/index.html').read_text(encoding='utf-8')
 ASSETS = {'/ui/style.css':('text/css',ROOT/'ui/style.css'),
+          '/ui/api-log.css':('text/css',ROOT/'ui/api-log.css'),
+          '/ui/api-log.js':('application/javascript',ROOT/'ui/api-log.js'),
           '/ui/app.js':('application/javascript',ROOT/'ui/app.js'),
           '/ui/business.js':('application/javascript',ROOT/'ui/business.js'),
           '/ui/simple.css':('text/css',ROOT/'ui/simple.css'),
@@ -30,11 +33,13 @@ ASSETS = {'/ui/style.css':('text/css',ROOT/'ui/style.css'),
           '/ui/headphones.svg':('image/svg+xml',ROOT/'ui/headphones.svg')}
 
 def make_handler(engine):
+    tool_api = ToolAPI()
     sessions = {}
     lock = threading.Lock()
     inference_lock = threading.Lock()
     examples = json.loads((ROOT/'data/demo_examples.json').read_text(encoding='utf-8'))
     class Handler(BaseHTTPRequestHandler):
+        gateway = tool_api
         def response(self,status,value,cookie=None,html=False,mime=None):
             body = value.encode('utf-8') if html or mime else json.dumps(value).encode()
             self.send_response(status)
@@ -73,6 +78,14 @@ def make_handler(engine):
                 self.response(200,ADVANCED_PAGE,html=True)
             elif self.path=='/compare':
                 self.response(200,COMPARE_PAGE,html=True)
+            elif self.path=='/api-log':
+                self.response(200,(ROOT/'ui/api-log.html').read_text(encoding='utf-8'),html=True)
+            elif self.path=='/api-log/events':
+                session=self.session()
+                if not session:
+                    self.response(403,{'error':'Open the storefront first to establish a session'})
+                    return
+                self.response(200,{'events':tool_api.recent(session['store'].workspace)})
             elif self.path in ASSETS:
                 mime,path = ASSETS[self.path]
                 self.response(200,path.read_text(encoding='utf-8'),mime=mime+'; charset=utf-8')
@@ -213,7 +226,7 @@ def make_handler(engine):
                     started=time.perf_counter()
                     result=process_store(engine,data.get('text'),data.get('settings',{}),emit)
                     with session['lock']:
-                        result=session['store'].apply_result(result,generation,data.get('request_id'))
+                        result=tool_api.submit(session['store'],result,generation,data.get('request_id'))
                     emit({'stage':'action_result','result':result})
                     if not result.get('idempotent_replay') or 'conversation' not in result:
                         emit({'stage':'speaking'})
@@ -245,6 +258,8 @@ def main():
     server = ThreadingHTTPServer(('127.0.0.1',port),make_handler(engine))
     url = f'http://127.0.0.1:{port}'
     print(f'Northline support is ready: {url}. Ctrl+C to stop.',flush=True)
+    print(f'Tool API: {server.RequestHandlerClass.gateway.url} | Live requests: {url}/api-log',flush=True)
+    print(f'JSONL log: {server.RequestHandlerClass.gateway.log_path}',flush=True)
     if os.environ.get('DEMO_NO_BROWSER')!='1':
         threading.Timer(1,lambda:webbrowser.open(url)).start()
     try:
@@ -253,6 +268,7 @@ def main():
         pass
     finally:
         server.server_close()
+        server.RequestHandlerClass.gateway.close()
 
 if __name__=='__main__':
     main()
